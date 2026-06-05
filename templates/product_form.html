@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}{% if product %}Modifier produit{% else %}Ajouter produit{% endif %}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{% if product %}Modifier le produit{% else %}Ajouter un produit{% endif %}</h1>
+        <p>Renseignez les informations du produit. Le code-barres doit contenir exactement 6 chiffres.</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="{{ url_for('products') }}" class="btn light">Retour</a>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <div class="panel-header">
+        <div>
+            <h2>Fiche produit</h2>
+            <div class="panel-subtitle">Création et mise à jour du catalogue</div>
+        </div>
+        <span class="badge info">Formulaire</span>
+    </div>
+
+    <form method="post" class="form grid-form">
+        <div>
+            <label>Nom du produit</label>
+            <input type="text" name="name" value="{{ product.name if product else '' }}" required>
+        </div>
+        <div>
+            <label>Code-barres à 6 chiffres</label>
+            <input type="text" name="barcode" pattern="\d{6}" maxlength="6" value="{{ product.barcode if product else generated_barcode }}" required>
+            <span class="form-hint">Exemple : 123456</span>
+        </div>
+        <div>
+            <label>Marque</label>
+            <select name="brand_id" required>
+                {% for brand in brands %}
+                    <option value="{{ brand.id }}" {% if product and product.brand_id == brand.id %}selected{% endif %}>{{ brand.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label>Type</label>
+            <select name="type_id" required>
+                {% for type in types %}
+                    <option value="{{ type.id }}" {% if product and product.type_id == type.id %}selected{% endif %}>{{ type.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label>Prix d'achat</label>
+            <input type="number" step="0.001" name="purchase_price" value="{{ product.purchase_price if product else 0 }}" required>
+        </div>
+        <div>
+            <label>Prix de vente</label>
+            <input type="number" step="0.001" name="sale_price" value="{{ product.sale_price if product else 0 }}" required>
+        </div>
+        <div>
+            <label>Quantité</label>
+            <input type="number" name="quantity" value="{{ product.quantity if product else 0 }}" required>
+        </div>
+        <div>
+            <label>Seuil stock faible</label>
+            <input type="number" name="min_quantity" value="{{ product.min_quantity if product else 5 }}" required>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn primary">Enregistrer</button>
+            <a href="{{ url_for('products') }}" class="btn light">Annuler</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block title %}Ventes journalières{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Ventes journalières</h1>
+        <p>Ajouter une vente par code-barres, ou manuellement si le produit n’a pas de code-barres.</p>
+    </div>
+</div>
+
+<section class="cards two">
+    <div class="card">
+        <span>Total ventes du jour</span>
+        <div class="kpi-value">{{ '%.3f'|format(total_day) }} DT</div>
+        <small>Date : {{ selected_date }}</small>
+    </div>
+
+    <div class="card">
+        <span>Quantité vendue</span>
+        <div class="kpi-value">{{ total_quantity }}</div>
+        <small>Total des articles vendus</small>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <h2>Ajouter une vente</h2>
+            <div class="panel-subtitle">
+                Tapez le code-barres si le produit existe. Sinon, laissez le code-barres vide et saisissez le nom + prix.
+            </div>
+        </div>
+    </div>
+
+    <form method="post" class="form grid-form">
+        <div>
+            <label>Code-barres du produit</label>
+            <input
+                type="text"
+                name="barcode"
+                placeholder="Exemple : 123456"
+                pattern="\d{6}"
+                maxlength="6"
+                autofocus>
+            <span class="form-hint">
+                Si ce champ est rempli, l'application cherche le produit et diminue automatiquement le stock.
+            </span>
+        </div>
+
+        <div>
+            <label>Quantité vendue</label>
+            <input
+                type="number"
+                name="quantity"
+                min="1"
+                placeholder="Exemple : 1"
+                required>
+        </div>
+
+        <div>
+            <label>Nom du produit manuel</label>
+            <input
+                type="text"
+                name="manual_product_name"
+                placeholder="À remplir seulement si pas de code-barres">
+            <span class="form-hint">
+                Utilisé seulement si le code-barres est vide.
+            </span>
+        </div>
+
+        <div>
+            <label>Prix de vente manuel</label>
+            <input
+                type="number"
+                step="0.001"
+                name="manual_unit_price"
+                placeholder="Exemple : 2.500">
+            <span class="form-hint">
+                Utilisé seulement si le code-barres est vide.
+            </span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn primary">Ajouter la vente</button>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <h2>Liste des ventes</h2>
+            <div class="panel-subtitle">Ventes affichées par jour.</div>
+        </div>
+    </div>
+
+    <form method="get" class="inline-form" style="margin-bottom: 18px;">
+        <input type="date" name="date" value="{{ selected_date }}">
+        <button type="submit" class="btn secondary">Afficher</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Heure</th>
+                <th>Code-barres</th>
+                <th>Nom du produit</th>
+                <th>Quantité vendue</th>
+                <th>Prix unitaire</th>
+                <th>Prix total</th>
+                <th>Type</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for sale in day_sales %}
+            <tr>
+                <td>{{ sale.sale_date.strftime('%H:%M') }}</td>
+                <td>
+                    {% if sale.product %}
+                        <span class="barcode">{{ sale.product.barcode }}</span>
+                    {% else %}
+                        <span class="badge info">Manuel</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if sale.product %}
+                        {{ sale.product.name }}
+                    {% else %}
+                        {{ sale.manual_product_name }}
+                    {% endif %}
+                </td>
+                <td>{{ sale.quantity }}</td>
+                <td>{{ '%.3f'|format(sale.unit_price) }} DT</td>
+                <td><strong>{{ '%.3f'|format(sale.total_price) }} DT</strong></td>
+                <td>
+                    {% if sale.product %}
+                        <span class="badge success">Stock</span>
+                    {% else %}
+                        <span class="badge info">Manuelle</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <form action="{{ url_for('delete_sale', sale_id=sale.id) }}" method="post" onsubmit="return confirm('Supprimer cette vente ? Le stock sera restauré seulement si la vente est liée à un produit.')">
+                        <button class="btn small danger" type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8" class="empty">Aucune vente pour cette date.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

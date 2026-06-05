@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Marques{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Marques</h1>
+        <p>Ajoutez et organisez les marques associées à vos produits.</p>
+    </div>
+</div>
+
+<div class="entity-grid">
+    <section class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>Ajouter une marque</h2>
+                <div class="panel-subtitle">Créez une nouvelle marque pour le catalogue</div>
+            </div>
+        </div>
+        <form method="post" class="inline-form">
+            <input type="text" name="name" placeholder="Nom de la marque" required>
+            <button type="submit" class="btn primary">Ajouter</button>
+        </form>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>Résumé</h2>
+                <div class="panel-subtitle">Nombre total de marques disponibles</div>
+            </div>
+        </div>
+        <div class="kpi-value">{{ brands|length }}</div>
+        <p class="muted">Chaque marque peut être liée à un ou plusieurs produits.</p>
+    </section>
+</div>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <h2>Liste des marques</h2>
+            <div class="panel-subtitle">Marques actuellement enregistrées</div>
+        </div>
+    </div>
+    <table>
+        <thead><tr><th>Marque</th><th>Nombre produits</th><th>Actions</th></tr></thead>
+        <tbody>
+        {% for brand in brands %}
+            <tr>
+                <td>{{ brand.name }}</td>
+                <td>{{ brand.products|length }}</td>
+                <td>
+                    <form action="{{ url_for('delete_brand', brand_id=brand.id) }}" method="post" onsubmit="return confirm('Supprimer cette marque ?')">
+                        <button class="btn small danger" type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="3" class="empty">Aucune marque.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

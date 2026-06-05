@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Connexion Admin{% endblock %}
+{% block content %}
+<div class="login-wrapper">
+    <section class="login-side">
+        <div class="logo big">LE</div>
+        <h1>Une gestion de stock élégante pour votre librairie.</h1>
+        <p>Suivez vos produits, marques, types et niveaux de stock dans une interface moderne pensée pour la rapidité, la clarté et la productivité.</p>
+
+        <div class="login-highlights">
+            <div class="highlight"><strong>Dashboard intelligent</strong><br><span>Vue globale des indicateurs essentiels en un coup d'œil.</span></div>
+            <div class="highlight"><strong>Produits & code-barres</strong><br><span>Gestion simple avec code-barres unique de 6 chiffres.</span></div>
+            <div class="highlight"><strong>Marques & types</strong><br><span>Organisation claire pour mieux structurer votre catalogue.</span></div>
+        </div>
+    </section>
+
+    <section class="login-card">
+        <div class="login-header">
+            <h2>Connexion administrateur</h2>
+            <p>Accédez à votre espace d'administration pour gérer le stock de la Librairie L'Espoir.</p>
+        </div>
+
+        <form method="post" class="form">
+            <label>Nom d'utilisateur</label>
+            <input type="text" name="username" placeholder="admin" required>
+
+            <label>Mot de passe</label>
+            <input type="password" name="password" placeholder="admin123" required>
+
+            <button type="submit" class="btn primary full">Se connecter</button>
+        </form>
+
+        <div class="login-demo">
+            <strong>Compte par défaut :</strong> admin / admin123
+        </div>
+    </section>
+</div>
+{% endblock %}

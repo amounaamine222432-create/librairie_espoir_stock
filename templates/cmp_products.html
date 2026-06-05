@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Livres CMP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Livres CMP</h1>
+        <p>Liste des livres scolaires enregistrés avec le type CMP.</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="{{ url_for('add_cmp_product') }}" class="btn primary">+ Ajouter livre CMP</a>
+        <a href="{{ url_for('products_pdf') }}" class="btn light">Télécharger PDF produits</a>
+    </div>
+</div>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <h2>Catalogue CMP</h2>
+            <div class="panel-subtitle">Type = CMP, marque = classe, achat = 0, seuil = 5.</div>
+        </div>
+        <span class="badge info">{{ products|length }} livre(s)</span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Code-barres</th>
+                <th>Classe / Marque</th>
+                <th>Achat</th>
+                <th>Vente</th>
+                <th>Quantité</th>
+                <th>Seuil</th>
+                <th>État</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for product in products %}
+            <tr class="{% if product.quantity <= product.min_quantity %}low-stock{% endif %}">
+                <td>{{ product.name }}</td>
+                <td><span class="barcode">{{ product.barcode }}</span></td>
+                <td>{{ product.brand.name }}</td>
+                <td>{{ '%.3f'|format(product.purchase_price) }} DT</td>
+                <td>{{ '%.3f'|format(product.sale_price) }} DT</td>
+                <td>{{ product.quantity }}</td>
+                <td>{{ product.min_quantity }}</td>
+                <td>
+                    {% if product.quantity <= product.min_quantity %}
+                        <span class="badge warning">Stock faible</span>
+                    {% else %}
+                        <span class="badge success">Disponible</span>
+                    {% endif %}
+                </td>
+                <td class="actions">
+                    <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn small secondary">Modifier</a>
+                    <form action="{{ url_for('delete_product', product_id=product.id) }}" method="post" onsubmit="return confirm('Supprimer ce livre CMP ?')">
+                        <button class="btn small danger" type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9" class="empty">Aucun livre CMP enregistré.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

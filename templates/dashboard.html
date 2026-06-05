@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Dashboard</h1>
+        <p>Vue générale, indicateurs de stock et suivi des derniers mouvements de la Librairie L'Espoir.</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="{{ url_for('add_product') }}" class="btn primary">+ Ajouter un produit</a>
+        <a href="{{ url_for('products') }}" class="btn light">Voir le catalogue</a>
+        <a href="{{ url_for('products_pdf') }}" class="btn light">Télécharger PDF</a>
+    </div>
+</div>
+
+<section class="hero-strip">
+    <div class="hero-card">
+        <span class="hero-label">Gestion centralisée</span>
+        <h3>Pilotez tout votre stock dans une interface moderne et fluide.</h3>
+        <p>Retrouvez les statistiques clés, la valeur du stock et les alertes importantes pour prendre des décisions rapides.</p>
+        <div class="hero-meta">
+            <span class="hero-chip">{{ total_products }} produits</span>
+            <span class="hero-chip">{{ total_brands }} marques</span>
+            <span class="hero-chip">{{ total_types }} types</span>
+        </div>
+    </div>
+    <div class="soft-panel">
+        <span class="mini-title">Alerte stock</span>
+        <div class="big-number">{{ low_stock_products|length }}</div>
+        <p>{% if low_stock_products|length > 0 %}Des produits doivent être réapprovisionnés rapidement.{% else %}Tout le stock est sous contrôle pour le moment.{% endif %}</p>
+    </div>
+</section>
+
+<section class="cards">
+    <div class="card">
+        <div class="icon-badge">P</div>
+        <span>Produits</span>
+        <strong>{{ total_products }}</strong>
+        <small>Total des articles enregistrés</small>
+    </div>
+    <div class="card">
+        <div class="icon-badge">M</div>
+        <span>Marques</span>
+        <strong>{{ total_brands }}</strong>
+        <small>Partenaires et fabricants</small>
+    </div>
+    <div class="card">
+        <div class="icon-badge">T</div>
+        <span>Types</span>
+        <strong>{{ total_types }}</strong>
+        <small>Catégories de classement</small>
+    </div>
+    <div class="card warning-card">
+        <div class="icon-badge">!</div>
+        <span>Stock faible</span>
+        <strong>{{ low_stock_products|length }}</strong>
+        <small>Produits à surveiller</small>
+    </div>
+</section>
+
+<section class="cards two">
+    <div class="card">
+        <span>Valeur d'achat du stock</span>
+        <div class="kpi-value">{{ '%.3f'|format(stock_value) }} DT</div>
+        <small>Montant total basé sur les prix d'achat</small>
+    </div>
+    <div class="card">
+        <span>Valeur de vente estimée</span>
+        <div class="kpi-value success-text">{{ '%.3f'|format(sale_value) }} DT</div>
+        <small>Projection de vente de tout le stock</small>
+    </div>
+</section>
+
+<div class="grid">
+    <section class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>Derniers produits ajoutés</h2>
+                <div class="panel-subtitle">Les 5 ajouts les plus récents</div>
+            </div>
+            <span class="badge info">Historique récent</span>
+        </div>
+        <table>
+            <thead><tr><th>Produit</th><th>Code-barres</th><th>Quantité</th></tr></thead>
+            <tbody>
+            {% for product in latest_products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td><span class="barcode">{{ product.barcode }}</span></td>
+                    <td>{{ product.quantity }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="3" class="empty">Aucun produit.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>Alertes stock faible</h2>
+                <div class="panel-subtitle">Produits au seuil minimum ou en dessous</div>
+            </div>
+            <span class="badge warning">Réapprovisionnement</span>
+        </div>
+        <table>
+            <thead><tr><th>Produit</th><th>Stock</th><th>Seuil</th></tr></thead>
+            <tbody>
+            {% for product in low_stock_products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td><strong class="danger-text">{{ product.quantity }}</strong></td>
+                    <td>{{ product.min_quantity }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="3" class="empty">Aucune alerte.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</div>
+{% endblock %}

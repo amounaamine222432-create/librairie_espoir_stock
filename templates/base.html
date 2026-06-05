@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Librairie L'Espoir{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+{% if session.get('admin_id') %}
+<aside class="sidebar">
+    <div class="brand-box">
+        <div class="logo">LE</div>
+        <div>
+            <h2>Librairie</h2>
+            <p>L'Espoir • Stock intelligent</p>
+        </div>
+    </div>
+    <p class="sub-note">Gérez vos produits, marques, types et ventes dans une interface moderne, rapide et simple à utiliser.</p>
+    <nav>
+        <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
+        <a href="{{ url_for('products') }}" class="{% if request.endpoint in ['products', 'add_product', 'edit_product'] %}active{% endif %}">Produits</a>
+        <a href="{{ url_for('brands') }}" class="{% if request.endpoint == 'brands' %}active{% endif %}">Marques</a>
+        <a href="{{ url_for('types') }}" class="{% if request.endpoint == 'types' %}active{% endif %}">Types</a>
+        <a href="{{ url_for('sales') }}" class="{% if request.endpoint in ['sales', 'delete_sale'] %}active{% endif %}">Ventes</a>
+        <a href="{{ url_for('cmp_products') }}" class="{% if request.endpoint in ['cmp_products', 'add_cmp_product'] %}active{% endif %}">Livres CMP</a>
+        <a href="{{ url_for('logout') }}" class="logout">Déconnexion</a>
+    </nav>
+    <div class="sidebar-footer">
+        <span class="mini-label">Session active</span>
+        <strong>{{ session.get('username', 'admin') }}</strong>
+        <span class="mini-label" style="margin-top: 10px;">Librairie L'Espoir</span>
+    </div>
+</aside>
+{% endif %}
+<main class="{% if session.get('admin_id') %}content{% else %}login-content{% endif %}">
+    {% if session.get('admin_id') %}
+    <div class="content-shell">
+        <div class="topbar">
+            <div><span class="eyebrow">Gestion de stock premium</span></div>
+            <div class="user-pill">
+                <span class="user-avatar">{{ session.get('username', 'A')[:1] }}</span>
+                <div><small>Connecté en tant que</small><strong>{{ session.get('username', 'admin') }}</strong></div>
+            </div>
+        </div>
+    {% endif %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="messages">
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+    {% if session.get('admin_id') %}
+        <footer>© {{ current_year }} Librairie L'Espoir — Gestion de stock moderne</footer>
+    </div>
+    {% endif %}
+</main>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Types{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Types</h1>
+        <p>Gérez les catégories ou types des produits de la librairie.</p>
+    </div>
+</div>
+
+<div class="entity-grid">
+    <section class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>Ajouter un type</h2>
+                <div class="panel-subtitle">Créez une nouvelle catégorie de produit</div>
+            </div>
+        </div>
+        <form method="post" class="inline-form">
+            <input type="text" name="name" placeholder="Nom du type" required>
+            <button type="submit" class="btn primary">Ajouter</button>
+        </form>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>Résumé</h2>
+                <div class="panel-subtitle">Nombre total de types disponibles</div>
+            </div>
+        </div>
+        <div class="kpi-value">{{ types|length }}</div>
+        <p class="muted">Les types aident à mieux classer et retrouver les produits.</p>
+    </section>
+</div>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <h2>Liste des types</h2>
+            <div class="panel-subtitle">Catégories actuellement enregistrées</div>
+        </div>
+    </div>
+    <table>
+        <thead><tr><th>Type</th><th>Nombre produits</th><th>Actions</th></tr></thead>
+        <tbody>
+        {% for type in types %}
+            <tr>
+                <td>{{ type.name }}</td>
+                <td>{{ type.products|length }}</td>
+                <td>
+                    <form action="{{ url_for('delete_type', type_id=type.id) }}" method="post" onsubmit="return confirm('Supprimer ce type ?')">
+                        <button class="btn small danger" type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="3" class="empty">Aucun type.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

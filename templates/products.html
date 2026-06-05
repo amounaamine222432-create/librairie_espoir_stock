@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Produits{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Produits</h1>
+        <p>Consultez, filtrez et gérez votre catalogue de produits avec une présentation plus claire et moderne.</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="{{ url_for('products_pdf', search=search, brand_id=selected_brand, type_id=selected_type) }}" class="btn light">Télécharger PDF</a>
+        <a href="{{ url_for('add_product') }}" class="btn primary">+ Ajouter un produit</a>
+    </div>
+</div>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <h2>Recherche avancée</h2>
+            <div class="panel-subtitle">Filtrez par nom, code-barres, marque ou type</div>
+        </div>
+        <span class="badge info">Catalogue</span>
+    </div>
+    <form method="get" class="filters">
+        <input type="text" name="search" placeholder="Rechercher par nom ou code-barres" value="{{ search }}">
+        <select name="brand_id">
+            <option value="">Toutes les marques</option>
+            {% for brand in brands %}
+                <option value="{{ brand.id }}" {% if selected_brand and selected_brand|int == brand.id %}selected{% endif %}>{{ brand.name }}</option>
+            {% endfor %}
+        </select>
+        <select name="type_id">
+            <option value="">Tous les types</option>
+            {% for type in types %}
+                <option value="{{ type.id }}" {% if selected_type and selected_type|int == type.id %}selected{% endif %}>{{ type.name }}</option>
+            {% endfor %}
+        </select>
+        <button class="btn secondary" type="submit">Filtrer</button>
+        <a href="{{ url_for('products') }}" class="btn light">Réinitialiser</a>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <h2>Liste des produits</h2>
+            <div class="panel-subtitle">Tous les produits enregistrés dans le stock</div>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Code-barres</th>
+                <th>Marque</th>
+                <th>Type</th>
+                <th>Achat</th>
+                <th>Vente</th>
+                <th>Quantité</th>
+                <th>Seuil</th>
+                <th>État</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for product in products %}
+            <tr class="{% if product.quantity <= product.min_quantity %}low-stock{% endif %}">
+                <td>{{ product.name }}</td>
+                <td><span class="barcode">{{ product.barcode }}</span></td>
+                <td>{{ product.brand.name }}</td>
+                <td>{{ product.product_type.name }}</td>
+                <td>{{ '%.3f'|format(product.purchase_price) }} DT</td>
+                <td>{{ '%.3f'|format(product.sale_price) }} DT</td>
+                <td>{{ product.quantity }}</td>
+                <td>{{ product.min_quantity }}</td>
+                <td>
+                    {% if product.quantity <= product.min_quantity %}
+                        <span class="badge warning">Stock faible</span>
+                    {% else %}
+                        <span class="badge success">Disponible</span>
+                    {% endif %}
+                </td>
+                <td class="actions">
+                    <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn small secondary">Modifier</a>
+                    <form action="{{ url_for('delete_product', product_id=product.id) }}" method="post" onsubmit="return confirm('Supprimer ce produit ?')">
+                        <button class="btn small danger" type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="10" class="empty">Aucun produit trouvé.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}
